@@ -1,22 +1,29 @@
 
+/*Nodemcu board conected with few sensors (listed below) to track various values and upload to Thinkspeak, blinking built-in led from board each upload.
 
-//(Description here..)NodeMcu 1.0 V3 "Lolin" ESP8266 12E, DHT22_temperature("not_used")/humidity_sensor, DS18B20_temperature_sensor, GL55_light_sensor, Thingspeak.com
+NodeMcu 1.0 V3 "Lolin" ESP8266 12E with: 
+  -DHT22 humidity_sensor (Temperature built-in sensor not used) 
+  -DS18B20 temperature_sensor,
+  -GL55 light_sensor.
+Thingspeak.com 
+
+*/
+
+/* EXTRA INFO AND SOURCES
+
+DHT circuit conection and libraries info at: https://learn.adafruit.com/dht/connecting-to-a-dhtxx-sensor
+DS18B20 circuit, libraries info and code at (Spanish): http://panamahitek.com/aprendiendo-utilizar-el-sensor-de-temperatura-ds18b20/
+LDR (GL55) circuit, example code and info at: (Spanish) https://polaridad.es/ldr-fotorresistencia-luz-luminosidad-medir-medicion-arduino/
+*/
 
 
-
-//------------------------------LIBRARIES BEGINS----------------------------
+//LIBRARIES
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
 #include <DHT.h>
 
 #include <WiFiClientSecure.h>
-#include <ESP8266WiFiAP.h>
-#include <ESP8266WiFiType.h>
-#include <ESP8266WiFiScan.h>
-#include <ESP8266WiFiMulti.h>
-#include <ESP8266WiFiSTA.h>
-#include <ESP8266WiFiGeneric.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiUdp.h>
@@ -24,12 +31,7 @@
 
 #include <ThingSpeak.h>
 
-#include <Adafruit_Sensor.h>
-//..............................LIBRARIES ENDS.............................
 
-
-
-//-----------------------------DEFINES BEGIN-------------------------
 //PINS
 #define DHTPIN D1     // what digital pin we're connected to
 #define DS18B20_PIN D2 // digital pin for DS18B20 temperature sensor
@@ -38,30 +40,14 @@
 
 //OTHERS
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
-//.............................DEFINITIONS ENDS...........................
 
 
-/* EXTRA INFO AND SOURCES
-
-DHT circuit conection and libraries info at: https://learn.adafruit.com/dht/connecting-to-a-dhtxx-sensor
-DS18B20 circuit, libraries info and code at (Spanish): http://panamahitek.com/aprendiendo-utilizar-el-sensor-de-temperatura-ds18b20/
-LDR (GL55) circuit, example code and info at: (Spanish) https://polaridad.es/ldr-fotorresistencia-luz-luminosidad-medir-medicion-arduino/
-
-
-*/
-
-
-
-//--------------INSTANCES BEGINS-----------------------------------------
+//INSTANCES
 DHT dht(DHTPIN, DHTTYPE); // Initialize DHT sensor.
 OneWire ourWire(DS18B20_PIN);
 DallasTemperature sensors(&ourWire);
 WiFiClient client;
-//..............INSTANCES ENDS...........................................
 
-
-
-//--------------VARIABLES DEFINITION BEGINS-----------------------------
 //WIFI NETWORK VARIABLES
 char ssid[] = "************"; //  your network SSID (name)
 char pass[] = "++++++++++++";    // your network password (use for WPA, or use as key for WEP)
@@ -75,11 +61,11 @@ float coeficient_percentage = 100.0/1024.0; // value of analog_in goes from 0 to
 short l;
 
 //THINGSPEAK VARIABLES
-unsigned long ChannelNumber = 000000;
-const char * APIKey = "***************";
+unsigned long ChannelNumber = 000000;   //write here your channel number on thinkspeak
+const char * APIKey = "***************";  //here your APIKey  
 const char * server = "api.thingspeak.com";
-//..............VARIABLES DEFINITION ENDS..............................
 
+//-------------------------------------------------------------------------------------
 
 void setup() {
   Serial.begin(115200);
@@ -94,12 +80,9 @@ void setup() {
 
 
 
-void loop() {
-  
+void loop() {  
 
-  
-
-  //-------------------------WIFI BEGINS----------------------------------------------
+  //WIFI BEGINS----------------------------------------------
    while (WiFi.status() != WL_CONNECTED) 
      {
       delay(500);
@@ -109,11 +92,10 @@ void loop() {
   Serial.println(""); 
   Serial.println("WiFi connected");
      }
-  //.........................WIFI ENDS................................................
+  //WIFI ENDS................................................
+      
 
-  
-
-  //-------------------------DHT BEGINS-----------------------------------------------  
+  //DHT BEGINS-----------------------------------------------  
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
@@ -128,11 +110,10 @@ void loop() {
   Serial.print("Humidity: "); 
   Serial.print(h);
   Serial.println(" %");
-  //........................DHT ENDS....................................................
-
+  //DHT ENDS....................................................
   
 
-  //------------------------DS18B20 BEGINS---------------------------------------------
+  //DS18B20 BEGINS---------------------------------------------
   sensors.requestTemperatures();
   t = sensors.getTempCByIndex(0);
  
@@ -140,11 +121,10 @@ void loop() {
   Serial.print("Temperature: ");
   Serial.print(t); 
   Serial.println(" ºC");
-  //........................DS18B20 ENDS...............................................
-
+  //DS18B20 ENDS...............................................
   
 
-  //------------------------LDR (GL55) BEGINS-----------------------------------------  
+  //LDR (GL55) BEGINS-----------------------------------------  
    luminity = analogRead(LDR);
    l = luminity * coeficient_percentage;
 
@@ -153,18 +133,19 @@ void loop() {
    Serial.print("Luminosity of: ");  
    Serial.print(l);
    Serial.println(" %");
-  //........................LDR (GL55) ENDS...........................................
+  //LDR (GL55) ENDS...........................................
 
-  digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
+  digitalWrite(LED_BUILTIN, LOW);   /* Turn the LED on (Note that LOW is the voltage level
                                     // but actually the LED is on; this is because 
-                                    // it is acive low on the ESP-01)
+                                     it is acive low on the ESP-01)
+                                     */
 
-  //------------------------THINGSPEAK BEGINS----------------------------------------
+  //THINGSPEAK BEGINS----------------------------------------
   ThingSpeak.setField(1,h);
   ThingSpeak.setField(2,t);
   ThingSpeak.setField(3,l);
   ThingSpeak.writeFields(ChannelNumber, APIKey);
-  //...........................THINGSPEAK ENDS........................................
+  //THINGSPEAK ENDS........................................
 
   digitalWrite(LED_BUILTIN, HIGH);  // Turn the LED off by making the voltage HIGH
 
