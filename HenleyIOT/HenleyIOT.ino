@@ -41,7 +41,7 @@
 
 //OTHERS
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
-#define LED_BUILTIN 2
+#define LED_BUILTIN 2 //Built-in LED on Nodemcu board
 
 
 //INSTANCES
@@ -51,13 +51,13 @@ DallasTemperature sensors(&ourWire);
 WiFiClient client;
 
 //WIFI NETWORK VARIABLES
-//Connection 1
+//Conection 1
 char ssid[] = "AAAAAA"; //  your network SSID (name)
-char pass[] = "****";    // your network password (use for WPA, or use as key for WEP)
+char pass[] = "******";    // your network password (use for WPA, or use as key for WEP)
 
-//Conection 2 (alternative). Uncomment lines below and comment lines above if you want to change wifi connection
-//char ssid[] = "BBBBBB"; //  your network SSID (name)
-//char pass[] = "****";    // your network password (use for WPA, or use as key for WEP)
+//alternative conection data (uncomment below and comment above)
+//char ssid[] = "AAAAAA"; 
+//char pass[] = "******";    
 
 //DS18B20 VARIABLES
 float t;
@@ -68,8 +68,8 @@ float coeficient_percentage = 100.0 / 1024.0; // value of analog_in goes from 0 
 short l;
 
 //THINGSPEAK VARIABLES
-unsigned long ChannelNumber = 364572;   //write here your channel number on thinkspeak
-const char * APIKey = "G0EHWCQIEXOE4XMP";  //here your "write" APIKey
+unsigned long ChannelNumber = 000000;   //write here your channel number on thinkspeak
+const char * APIKey = "AAAAAA";  //here your "write" APIKey
 const char * server = "api.thingspeak.com";
 
 //-------------------------------------------------------------------------------------
